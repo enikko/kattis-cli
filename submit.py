@@ -314,7 +314,7 @@ def show_judgement(submission_url, cfg):
         if status_id > _RUNNING_STATUS:
             # Done
             print()
-            break
+            return status_id == _ACCEPTED_STATUS
 
         time.sleep(1)
 
@@ -335,6 +335,9 @@ Overrides default guess (based on suffix of first filename)''')
     parser.add_argument('-f', '--force',
                         help='Force, no confirmation prompt before submission',
                         action='store_true')
+    parser.add_argument("--no-browser",
+                        help="Disable the open browser promt",
+                        action="store_true")
     parser.add_argument('files', nargs='+')
 
     args = parser.parse_args()
@@ -426,9 +429,10 @@ extension "%s"''' % (ext,))
         pass
 
     if submission_url:
-        open_submission(submission_url)
-        show_judgement(submission_url, cfg)
-
+        if not args.no_browser:
+            open_submission(submission_url)
+        if not show_judgement(submission_url, cfg):
+            sys.exit(1)
 
 if __name__ == '__main__':
     main()
